@@ -13,7 +13,7 @@ class FetchNewsCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'fetch:news {--source=}';
+    protected $signature = 'fetch:news {--source= Specific source to fetch from}';
 
     /**
      * The console command description.
@@ -31,7 +31,7 @@ class FetchNewsCommand extends Command
 
         $source = $this->option('source');
 
-        $this->info('Fetching from: '.$source);
+        $this->info((string) 'Fetching from: '.$source);
 
         match ($source) {
             'bbc' => $this->info('Fetching BBC news...'),

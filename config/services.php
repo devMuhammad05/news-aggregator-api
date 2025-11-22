@@ -35,8 +35,11 @@ return [
         ],
     ],
 
-    'news_api' => [
-        'key' => env('NEWS_API_KEY'),
+    'news' => [
+        'newsapi' => [
+            'api_key' => env('NEWSAPI_KEY'),
+            'base_url' => 'https://newsapi.org',
+        ],
     ],
 
 ];
