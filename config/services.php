@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'news_api' => [
+        'key' => env('NEWS_API_KEY'),
+    ],
+
 ];
