@@ -21,8 +21,8 @@ abstract class AbstractNewsSource implements NewsSourceInterface
 
     public function __construct(Repository $repository)
     {
-        $this->apiKey = $repository->get(sprintf('services.news.%s.api_key', $this->getSourceKey()));
-        $this->baseUrl = $repository->get(sprintf('services.news.%s.base_url', $this->getSourceKey()));
+        $this->apiKey = $repository->get("news_source.sources.{$this->getSourceKey()}.api_key");
+        $this->baseUrl = $repository->get("news_source.sources.{$this->getSourceKey()}.base_url");
     }
 
     protected function makeRequest(array $params = []): array
@@ -30,7 +30,7 @@ abstract class AbstractNewsSource implements NewsSourceInterface
         try {
             $response = Http::timeout($this->timeout)
                 ->withHeaders([
-                    'Authorization' => (string) 'Bearer '.$this->apiKey,
+                    'Authorization' => (string) 'Bearer ' . $this->apiKey,
                     'Accept' => 'application/json',
                 ])
                 ->get($this->baseUrl, $params);
@@ -43,7 +43,7 @@ abstract class AbstractNewsSource implements NewsSourceInterface
 
                 return [
                     'success' => false,
-                    'error' => 'API request failed with status: '.$response->status(),
+                    'error' => 'API request failed with status: ' . $response->status(),
                     'data' => [],
                 ];
             }
@@ -55,10 +55,6 @@ abstract class AbstractNewsSource implements NewsSourceInterface
                 'data' => $data,
             ];
         } catch (ConnectionException $e) {
-            Log::error('API connection error', [
-                'error' => $e->getMessage(),
-            ]);
-
             return [
                 'success' => false,
                 'error' => 'Connection timeout or network error',
