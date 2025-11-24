@@ -30,7 +30,7 @@ abstract class AbstractNewsSource implements NewsSourceInterface
         try {
             $response = Http::timeout($this->timeout)
                 ->withHeaders([
-                    'Authorization' => (string) 'Bearer ' . $this->apiKey,
+                    'Authorization' => (string) 'Bearer '.$this->apiKey,
                     'Accept' => 'application/json',
                 ])
                 ->get($this->baseUrl, $params);
@@ -43,7 +43,7 @@ abstract class AbstractNewsSource implements NewsSourceInterface
 
                 return [
                     'success' => false,
-                    'error' => 'API request failed with status: ' . $response->status(),
+                    'error' => 'API request failed with status: '.$response->status(),
                     'data' => [],
                 ];
             }

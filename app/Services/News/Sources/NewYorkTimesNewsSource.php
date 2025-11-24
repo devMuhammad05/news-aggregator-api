@@ -10,29 +10,28 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-class TheGuardianNewsSource extends AbstractNewsSource
+class NewYorkTimesNewsSource extends AbstractNewsSource
 {
     public function getSourceName(): string
     {
-        return 'The Guardian';
+        return 'New York Times';
     }
 
     public function getSourceKey(): string
     {
-        return 'guardian';
+        return 'nytimes';
     }
 
     public function fetchArticles(array $params = []): array
     {
         $defaultParams = [
-            'show-fields' => 'all',
-            'page-size' => 20,
+            'sort' => 'newest',
         ];
 
         $params = array_merge($defaultParams, $params);
 
         if (isset($params['category'])) {
-            $params['section'] = $params['category'];
+            $params['fq'] = 'section_name:("'.$params['category'].'")';
             unset($params['category']);
         }
 
@@ -42,20 +41,39 @@ class TheGuardianNewsSource extends AbstractNewsSource
             return [];
         }
 
-        $results = $response['data']['response']['results'] ?? [];
+        $docs = $response['data']['response']['docs'] ?? [];
 
         return array_map(function ($article) {
             return new ArticleDTO(
-                title: $article['webTitle'] ?? 'Untitled Article',
-                author: $article['fields']['byline'] ?? null,
-                description: $article['fields']['trailText'] ?? null,
-                content: $article['fields']['body'] ?? null,
-                source: 'The Guardian',
-                sourceUrl: $article['webUrl'] ?? null,
-                imageUrl: $article['fields']['thumbnail'] ?? null,
-                publishedAt: isset($article['webPublicationDate']) ? Date::parse($article['webPublicationDate']) : null,
+                title: $article['headline']['main'] ?? 'Untitled Article',
+                author: $article['byline']['original'] ?? null,
+                description: $article['abstract'] ?? $article['snippet'] ?? null,
+                content: $article['lead_paragraph'] ?? null,
+                source: 'New York Times',
+                sourceUrl: $article['web_url'] ?? null,
+                imageUrl: $this->getImageUrl($article['multimedia'] ?? []),
+                publishedAt: isset($article['pub_date']) ? Date::parse($article['pub_date']) : null,
             );
-        }, $results);
+        }, $docs);
+    }
+
+    private function getImageUrl(array $multimedia): ?string
+    {
+        if (empty($multimedia)) {
+            return null;
+        }
+
+        foreach ($multimedia as $media) {
+            if (($media['subtype'] ?? '') === 'xlarge') {
+                return 'https://static01.nyt.com/'.$media['url'];
+            }
+        }
+
+        if (isset($multimedia[0]['url'])) {
+            return 'https://static01.nyt.com/'.$multimedia[0]['url'];
+        }
+
+        return null;
     }
 
     /**
@@ -70,7 +88,7 @@ class TheGuardianNewsSource extends AbstractNewsSource
                 ->get($this->baseUrl, $params);
 
             if ($response->failed()) {
-                Log::error('Guardian API request failed', [
+                Log::error('NYT API request failed', [
                     'status' => $response->status(),
                     'body' => $response->body(),
                 ]);
@@ -87,7 +105,7 @@ class TheGuardianNewsSource extends AbstractNewsSource
                 'data' => $response->json(),
             ];
         } catch (Exception $exception) {
-            Log::error('Guardian API request exception', [
+            Log::error('NYT API request exception', [
                 'error' => $exception->getMessage(),
             ]);
 
