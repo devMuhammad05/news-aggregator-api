@@ -33,5 +33,5 @@ jobs:
       - name: Code style Analysis
         run: ./vendor/bin/pint --parallel --test
 
-      # - name: Static Analysis
-      #   run: ./vendor/bin/phpstan analyse --memory-limit=-1
+      - name: Static Analysis
+        run: ./vendor/bin/phpstan analyse --memory-limit=-1

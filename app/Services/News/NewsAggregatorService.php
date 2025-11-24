@@ -6,8 +6,8 @@ namespace App\Services\News;
 
 use App\DTO\ArticleDTO;
 use App\Models\Article;
-use Illuminate\Support\Facades\Log;
 use App\Services\News\Contracts\NewsSourceInterface;
+use Illuminate\Support\Facades\Log;
 
 class NewsAggregatorService
 {
@@ -19,6 +19,7 @@ class NewsAggregatorService
     public function addSource(NewsSourceInterface $newsSourceInterface): self
     {
         $this->sources[$newsSourceInterface->getSourceKey()] = $newsSourceInterface;
+
         return $this;
     }
 
@@ -50,13 +51,13 @@ class NewsAggregatorService
     public function aggregateFromSource(NewsSourceInterface $source, array $params = [])
     {
         try {
-            Log::info('Fetching articles from ' . $source->getSourceName());
+            Log::info('Fetching articles from '.$source->getSourceName());
 
             $articles = $source->fetchArticles($params);
 
             $savedCount = 0;
             foreach ($articles as $articleDto) {
-                if (!($articleDto instanceof ArticleDTO)) {
+                if (! ($articleDto instanceof ArticleDTO)) {
                     continue;
                 }
 
@@ -66,7 +67,7 @@ class NewsAggregatorService
                 if (empty($articleDto->sourceUrl)) {
                     $keys = [
                         'title' => $articleDto->title,
-                        'source' => $articleDto->source
+                        'source' => $articleDto->source,
                     ];
                 }
 
@@ -78,7 +79,7 @@ class NewsAggregatorService
             }
 
             Log::info('Completed fetching articles', ['source' => $source->getSourceName(), 'count' => $savedCount]);
-            
+
         } catch (\Exception $exception) {
             Log::error(sprintf('Error aggregating from %s: %s', $source->getSourceName(), $exception->getMessage()));
 

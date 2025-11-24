@@ -30,7 +30,7 @@ class NewsApiSource extends AbstractNewsSource
 
         $response = $this->makeRequest($params);
 
-        if (!$response['success']) {
+        if (! $response['success']) {
             return [];
         }
 
