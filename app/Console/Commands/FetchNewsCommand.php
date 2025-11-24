@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
+use App\Services\News\NewsAggregatorService;
+use App\Services\News\Sources\NewsApiSource;
 
 class FetchNewsCommand extends Command
 {
@@ -25,20 +28,46 @@ class FetchNewsCommand extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(NewsAggregatorService $newsAggregatorService)
     {
         $this->info('News aggregation started...');
 
-        $source = $this->option('source');
+        $newsAggregatorService->addSource(new NewsApiSource());
 
-        $this->info((string) 'Fetching from: '.$source);
+        $sourceKey = $this->option('source');
 
-        match ($source) {
-            'bbc' => $this->info('Fetching BBC news...'),
-            'news api' => $this->info('Fetching NEWS news...'),
-            default => $this->info('All source'),
-        };
+        $sources = $newsAggregatorService->getSources();
 
-        return 1;
+        Log::info("sources", [
+            "sources" => $sources
+        ]);
+
+        if ($sourceKey) {
+            if (!isset($sources[$sourceKey])) {
+                $this->error(sprintf('Source %s not found', $sourceKey));
+                return 1;
+            }
+
+            $this->info((string) 'Fetching from: ' . $sourceKey);
+
+            $result = $newsAggregatorService->aggregateFromSource($sources[$sourceKey]);
+            if (isset($result['error'])) {
+                $this->error(sprintf('Error fetching from %s: ', $sourceKey) . $result['error']);
+            } else {
+                $this->info("Fetched " . ($result['count'] ?? 0) . (' articles from ' . $sourceKey));
+            }
+        } else {
+            $results = $newsAggregatorService->aggregateFromAllSources();
+            foreach ($results as $key => $res) {
+                if (isset($res['error'])) {
+                    $this->error(sprintf('Error fetching from %s: ', $key) . $res['error']);
+                } else {
+                    $this->info("Fetched " . ($res['count'] ?? 0) . (' articles from ' . $key));
+                }
+            }
+        }
+
+        $this->info('News aggregation completed!');
+        return 0;
     }
 }

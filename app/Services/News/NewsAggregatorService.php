@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services\News;
 
-use App\Services\News\Contracts\NewsSourceInterface;
+use App\DTO\ArticleDTO;
+use App\Models\Article;
 use Illuminate\Support\Facades\Log;
+use App\Services\News\Contracts\NewsSourceInterface;
 
 class NewsAggregatorService
 {
@@ -14,11 +16,11 @@ class NewsAggregatorService
     /**
      * Add a news source
      */
-    // public function addSource(NewsSourceInterface $newsSourceInterface): self
-    // {
-    //     $this->sources[$newsSourceInterface->getSourceKey()] = $newsSourceInterface;
-    //     return $this;
-    // }
+    public function addSource(NewsSourceInterface $newsSourceInterface): self
+    {
+        $this->sources[$newsSourceInterface->getSourceKey()] = $newsSourceInterface;
+        return $this;
+    }
 
     /**
      * Get all news sources
@@ -35,8 +37,8 @@ class NewsAggregatorService
     {
         $results = [];
 
-        foreach ($this->sources as $sourceId => $source) {
-            $results[$sourceId] = $this->aggregateFromSource($source, $params);
+        foreach ($this->sources as $sourceKey => $source) {
+            $results[$sourceKey] = $this->aggregateFromSource($source, $params);
         }
 
         return $results;
@@ -48,11 +50,34 @@ class NewsAggregatorService
     public function aggregateFromSource(NewsSourceInterface $source, array $params = [])
     {
         try {
-            Log::info('Fetching articles from '.$source->getSourceName());
+            Log::info('Fetching articles from ' . $source->getSourceName());
 
             $articles = $source->fetchArticles($params);
 
-            Log::info('Completed', $articles);
+            $savedCount = 0;
+            foreach ($articles as $articleDto) {
+                if (!($articleDto instanceof ArticleDTO)) {
+                    continue;
+                }
+
+                $attributes = $articleDto->toArray();
+
+                $keys = ['source_url' => $articleDto->sourceUrl];
+                if (empty($articleDto->sourceUrl)) {
+                    $keys = [
+                        'title' => $articleDto->title,
+                        'source' => $articleDto->source
+                    ];
+                }
+
+                Article::updateOrCreate(
+                    $keys,
+                    $attributes
+                );
+                $savedCount++;
+            }
+
+            Log::info('Completed fetching articles', ['source' => $source->getSourceName(), 'count' => $savedCount]);
 
         } catch (\Exception $exception) {
             Log::error(sprintf('Error aggregating from %s: %s', $source->getSourceName(), $exception->getMessage()));

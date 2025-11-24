@@ -38,7 +38,7 @@ return [
     'news' => [
         'newsapi' => [
             'api_key' => env('NEWSAPI_KEY'),
-            'base_url' => 'https://newsapi.org',
+            'base_url' => 'https://newsapi.org/v2/top-headlines',
         ],
     ],
 

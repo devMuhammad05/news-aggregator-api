@@ -14,9 +14,8 @@ return new class extends Migration
         Schema::create('articles', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->foreignId('author_id')->nullable()->constrained()->cascadeOnDelete();
-            $table->foreignId('category_id')->nullable()->constrained()->cascadeOnDelete();
-            $table->string('description')->nullable();
+            $table->string('author_name')->nullable();
+            $table->longText('description')->nullable();
             $table->longText('content');
             $table->string('source');
             $table->string('source_url')->nullable();
