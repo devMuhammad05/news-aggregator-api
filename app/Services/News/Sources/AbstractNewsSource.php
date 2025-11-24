@@ -25,6 +25,10 @@ abstract class AbstractNewsSource implements NewsSourceInterface
         $this->baseUrl = $repository->get("news_source.sources.{$this->getSourceKey()}.base_url");
     }
 
+    /**
+     * @param  array<string, mixed>  $params
+     * @return array<string, mixed>
+     */
     protected function makeRequest(array $params = []): array
     {
         try {

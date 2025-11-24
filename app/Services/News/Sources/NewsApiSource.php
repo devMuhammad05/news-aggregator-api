@@ -19,6 +19,10 @@ class NewsApiSource extends AbstractNewsSource
         return 'newsapi';
     }
 
+    /**
+     * @param  array<string, mixed>  $params
+     * @return array<int, ArticleDTO>
+     */
     public function fetchArticles(array $params = []): array
     {
         $defaultParams = [

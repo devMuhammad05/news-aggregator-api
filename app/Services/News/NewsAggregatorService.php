@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services\News;
 
-use App\DTO\ArticleDTO;
 use App\Models\Article;
 use App\Services\News\Contracts\NewsSourceInterface;
 use Exception;
@@ -12,6 +11,9 @@ use Illuminate\Support\Facades\Log;
 
 class NewsAggregatorService
 {
+    /**
+     * @var array<string, NewsSourceInterface>
+     */
     protected array $sources = [];
 
     /**
@@ -26,6 +28,8 @@ class NewsAggregatorService
 
     /**
      * Get all news sources
+     *
+     * @return array<string, NewsSourceInterface>
      */
     public function getSources(): array
     {
@@ -34,6 +38,9 @@ class NewsAggregatorService
 
     /**
      * Fetch and store articles from all sources
+     *
+     * @param  array<string, mixed>  $params
+     * @return array<string, array<string, mixed>>
      */
     public function aggregateFromAllSources(array $params = []): array
     {
@@ -48,6 +55,9 @@ class NewsAggregatorService
 
     /**
      * Fetch and store articles from a specific source
+     *
+     * @param  array<string, mixed>  $params
+     * @return array<string, mixed>
      */
     public function aggregateFromSource(NewsSourceInterface $source, array $params = [])
     {
@@ -58,9 +68,6 @@ class NewsAggregatorService
 
             $articleCount = 0;
             foreach ($articles as $articleDto) {
-                if (! ($articleDto instanceof ArticleDTO)) {
-                    continue;
-                }
 
                 $attributes = $articleDto->toArray();
 
@@ -84,7 +91,6 @@ class NewsAggregatorService
                 'count' => $articleCount,
                 'status' => 'success',
             ];
-
         } catch (Exception $exception) {
             Log::error(sprintf('Error aggregating from %s: %s', $source->getSourceName(), $exception->getMessage()));
 

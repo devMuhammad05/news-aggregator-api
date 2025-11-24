@@ -19,6 +19,9 @@ class ArticleDTO
         public readonly ?Carbon $publishedAt,
     ) {}
 
+    /**
+     * @return array<string, mixed>
+     */
     public function toArray(): array
     {
         return [

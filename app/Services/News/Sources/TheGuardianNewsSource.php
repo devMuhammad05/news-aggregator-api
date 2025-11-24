@@ -22,6 +22,10 @@ class TheGuardianNewsSource extends AbstractNewsSource
         return 'guardian';
     }
 
+    /**
+     * @param  array<string, mixed>  $params
+     * @return array<int, ArticleDTO>
+     */
     public function fetchArticles(array $params = []): array
     {
         $defaultParams = [
@@ -60,6 +64,9 @@ class TheGuardianNewsSource extends AbstractNewsSource
 
     /**
      * Override makeRequest
+     *
+     * @param  array<string, mixed>  $params
+     * @return array<string, mixed>
      */
     protected function makeRequest(array $params = []): array
     {

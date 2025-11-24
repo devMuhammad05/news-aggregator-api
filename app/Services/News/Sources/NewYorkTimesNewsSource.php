@@ -23,6 +23,10 @@ class NewYorkTimesNewsSource extends AbstractNewsSource
         return 'nytimes';
     }
 
+    /**
+     * @param  array<string, mixed>  $params
+     * @return array<int, ArticleDTO>
+     */
     public function fetchArticles(array $params = []): array
     {
         $defaultParams = [
@@ -58,6 +62,9 @@ class NewYorkTimesNewsSource extends AbstractNewsSource
         }, $docs);
     }
 
+    /**
+     * @param  array<int, array<string, mixed>>  $multimedia
+     */
     private function getImageUrl(array $multimedia): ?string
     {
         if (empty($multimedia)) {
@@ -79,6 +86,9 @@ class NewYorkTimesNewsSource extends AbstractNewsSource
 
     /**
      * Override makeRequest
+     *
+     * @param  array<string, mixed>  $params
+     * @return array<string, mixed>
      */
     protected function makeRequest(array $params = []): array
     {

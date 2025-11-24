@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services\News\Contracts;
 
+use App\DTO\ArticleDTO;
+
 interface NewsSourceInterface
 {
     /**
@@ -18,6 +20,9 @@ interface NewsSourceInterface
 
     /**
      * Fetch articles from the news source
+     *
+     * @param  array<string, mixed>  $params
+     * @return array<int, ArticleDTO>
      */
     public function fetchArticles(array $params = []): array;
 }
