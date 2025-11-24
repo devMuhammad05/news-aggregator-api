@@ -18,8 +18,6 @@ interface NewsSourceInterface
 
     /**
      * Fetch articles from the news source
-     *
-     * @param array $params
      */
     public function fetchArticles(array $params = []): array;
 }

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services\News\Sources;
 
+use Illuminate\Contracts\Config\Repository;
+use Illuminate\Http\Client\ConnectionException;
+use Exception;
 use App\Services\News\Contracts\NewsSourceInterface;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -16,7 +19,7 @@ abstract class AbstractNewsSource implements NewsSourceInterface
 
     protected int $timeout = 30;
 
-    public function __construct(\Illuminate\Contracts\Config\Repository $repository)
+    public function __construct(Repository $repository)
     {
         $this->apiKey = $repository->get(sprintf('services.news.%s.api_key', $this->getSourceKey()));
         $this->baseUrl = $repository->get(sprintf('services.news.%s.base_url', $this->getSourceKey()));
@@ -27,7 +30,7 @@ abstract class AbstractNewsSource implements NewsSourceInterface
         try {
             $response = Http::timeout($this->timeout)
                 ->withHeaders([
-                    'Authorization' => (string) 'Bearer ' . $this->apiKey,
+                    'Authorization' => (string) 'Bearer '.$this->apiKey,
                     'Accept' => 'application/json',
                 ])
                 ->get($this->baseUrl, $params);
@@ -40,7 +43,7 @@ abstract class AbstractNewsSource implements NewsSourceInterface
 
                 return [
                     'success' => false,
-                    'error' => 'API request failed with status: ' . $response->status(),
+                    'error' => 'API request failed with status: '.$response->status(),
                     'data' => [],
                 ];
             }
@@ -51,7 +54,7 @@ abstract class AbstractNewsSource implements NewsSourceInterface
                 'success' => true,
                 'data' => $data,
             ];
-        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+        } catch (ConnectionException $e) {
             Log::error('API connection error', [
                 'error' => $e->getMessage(),
             ]);
@@ -61,7 +64,7 @@ abstract class AbstractNewsSource implements NewsSourceInterface
                 'error' => 'Connection timeout or network error',
                 'data' => [],
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('API request exception', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),

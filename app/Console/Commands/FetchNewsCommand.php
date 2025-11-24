@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\App;
 use App\Services\News\NewsAggregatorService;
 use App\Services\News\Sources\NewsApiSource;
 use Illuminate\Console\Command;
@@ -26,13 +28,18 @@ class FetchNewsCommand extends Command
     protected $description = 'Fetch news from different source';
 
     /**
+     * Create a new console command instance.
+     */
+    // public function __construct()
+    // {
+    // }
+
+    /**
      * Execute the console command.
      */
     public function handle(NewsAggregatorService $newsAggregatorService)
     {
         $this->info('News aggregation started...');
-
-        $newsAggregatorService->addSource(app(NewsApiSource::class));
 
         $sourceKey = $this->option('source');
 
@@ -49,21 +56,21 @@ class FetchNewsCommand extends Command
                 return 1;
             }
 
-            $this->info((string) 'Fetching from: ' . $sourceKey);
+            $this->info((string) 'Fetching from: '.$sourceKey);
 
             $result = $newsAggregatorService->aggregateFromSource($sources[$sourceKey]);
             if (isset($result['error'])) {
-                $this->error(sprintf('Error fetching from %s: ', $sourceKey) . $result['error']);
+                $this->error(sprintf('Error fetching from %s: ', $sourceKey).$result['error']);
             } else {
-                $this->info('Fetched ' . ($result['count'] ?? 0) . (' articles from ' . $sourceKey));
+                $this->info('Fetched '.($result['count'] ?? 0).(' articles from '.$sourceKey));
             }
         } else {
             $results = $newsAggregatorService->aggregateFromAllSources();
             foreach ($results as $key => $res) {
                 if (isset($res['error'])) {
-                    $this->error(sprintf('Error fetching from %s: ', $key) . $res['error']);
+                    $this->error(sprintf('Error fetching from %s: ', $key).$res['error']);
                 } else {
-                    $this->info('Fetched ' . ($res['count'] ?? 0) . (' articles from ' . $key));
+                    $this->info('Fetched '.($res['count'] ?? 0).(' articles from '.$key));
                 }
             }
         }

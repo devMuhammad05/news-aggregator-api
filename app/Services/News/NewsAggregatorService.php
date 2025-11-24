@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\News;
 
+use Exception;
 use App\DTO\ArticleDTO;
 use App\Models\Article;
 use App\Services\News\Contracts\NewsSourceInterface;
@@ -80,7 +81,7 @@ class NewsAggregatorService
 
             Log::info('Completed fetching articles', ['source' => $source->getSourceName(), 'count' => $savedCount]);
 
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             Log::error(sprintf('Error aggregating from %s: %s', $source->getSourceName(), $exception->getMessage()));
 
             return [

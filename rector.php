@@ -37,7 +37,7 @@ return RectorConfig::configure()
     ->withRules([
         DeclareStrictTypesRector::class,
     ])
-
+    ->withImportNames()
     ->withSkip([
         __DIR__.'/bootstrap/cache',
     ]);

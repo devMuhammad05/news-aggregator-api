@@ -1,6 +1,9 @@
 <?php
 
+use App\Providers\AppServiceProvider;
+use App\Providers\NewsAggregatorServiceProvider;
+
 return [
-    App\Providers\AppServiceProvider::class,
-    App\Providers\NewsAggregatorServiceProvider::class,
+    AppServiceProvider::class,
+    NewsAggregatorServiceProvider::class,
 ];
