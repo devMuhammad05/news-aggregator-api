@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Services\News\Contracts\NewsSourceInterface;
+use App\Jobs\FetchNewsJob;
 use App\Services\News\NewsAggregatorService;
 use Illuminate\Console\Command;
+use Illuminate\Events\Dispatcher;
 
 class FetchNewsCommand extends Command
 {
@@ -23,6 +24,14 @@ class FetchNewsCommand extends Command
      * @var string
      */
     protected $description = 'Fetch news from configured sources';
+
+    /**
+     * Create a new console command instance.
+     */
+    public function __construct(private readonly Dispatcher $dispatcher)
+    {
+        parent::__construct();
+    }
 
     /**
      * Execute the console command.
@@ -47,38 +56,17 @@ class FetchNewsCommand extends Command
                 return self::FAILURE;
             }
 
-            $this->processSource($newsAggregatorService, $sources[$sourceKey]);
+            $this->line("Fetching news from: <comment>{$sources[$sourceKey]->getSourceName()}</comment>...");
+            $this->dispatcher->dispatch(new FetchNewsJob($sourceKey));
         } else {
-            foreach ($sources as $source) {
-                $this->processSource($newsAggregatorService, $source);
+            foreach ($sources as $key => $source) {
+                $this->line("Fetching news from: <comment>{$source->getSourceName()}</comment>...");
+                $this->dispatcher->dispatch(new FetchNewsJob($key));
             }
         }
 
-        $this->info('News aggregation completed!');
+        $this->info('News aggregation is processing in the background.');
 
         return self::SUCCESS;
-    }
-
-    /**
-     * Process a single news source.
-     */
-    private function processSource(NewsAggregatorService $service, NewsSourceInterface $source): void
-    {
-        $sourceName = $source->getSourceName();
-
-        $this->line("Fetching from: <comment>{$sourceName}</comment>...");
-
-        $result = $service->aggregateFromSource($source);
-
-        if (($result['status'] ?? null) === 'error') {
-            $message = $result['error'] ?? 'Unknown error, try again.';
-
-            $this->error("Failed to fetch from {$sourceName}: {$message}");
-
-            return;
-        }
-
-        $count = $result['count'] ?? 0;
-        $this->info("Successfully fetched {$count} articles from {$sourceName}.");
     }
 }
