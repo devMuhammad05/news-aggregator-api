@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\News\Sources;
 
 use App\DTO\ArticleDTO;
+use Illuminate\Support\Facades\Date;
 
 class NewsApiSource extends AbstractNewsSource
 {
@@ -37,14 +38,14 @@ class NewsApiSource extends AbstractNewsSource
 
         return array_map(function ($article) {
             return new ArticleDTO(
-                title: $article['title'] ?? 'Untitled',
+                title: $article['title'] ?? 'Untitled Article',
                 author: $article['author'] ?? null,
                 description: $article['description'] ?? null,
                 content: $article['content'] ?? null,
                 source: $article['source']['name'] ?? 'NewsAPI',
                 sourceUrl: $article['url'] ?? null,
                 imageUrl: $article['urlToImage'] ?? null,
-                publishedAt: isset($article['publishedAt']) ? \Illuminate\Support\Facades\Date::parse($article['publishedAt']) : null,
+                publishedAt: isset($article['publishedAt']) ? Date::parse($article['publishedAt']) : null,
             );
         }, $articles);
     }

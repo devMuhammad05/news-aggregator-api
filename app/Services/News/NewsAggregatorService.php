@@ -78,13 +78,14 @@ class NewsAggregatorService
             }
 
             Log::info('Completed fetching articles', ['source' => $source->getSourceName(), 'count' => $savedCount]);
-
+            
         } catch (\Exception $exception) {
             Log::error(sprintf('Error aggregating from %s: %s', $source->getSourceName(), $exception->getMessage()));
 
             return [
                 'source' => $source->getSourceName(),
                 'error' => $exception->getMessage(),
+                'status' => 'error',
             ];
         }
     }
