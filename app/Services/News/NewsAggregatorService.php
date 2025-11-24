@@ -52,11 +52,11 @@ class NewsAggregatorService
     public function aggregateFromSource(NewsSourceInterface $source, array $params = [])
     {
         try {
-            Log::info('Fetching articles from '.$source->getSourceName());
+            Log::info('Fetching articles from ' . $source->getSourceName());
 
             $articles = $source->fetchArticles($params);
 
-            $savedCount = 0;
+            $articleCount = 0;
             foreach ($articles as $articleDto) {
                 if (! ($articleDto instanceof ArticleDTO)) {
                     continue;
@@ -76,10 +76,14 @@ class NewsAggregatorService
                     $keys,
                     $attributes
                 );
-                $savedCount++;
+                $articleCount++;
             }
 
-            Log::info('Completed fetching articles', ['source' => $source->getSourceName(), 'count' => $savedCount]);
+            return [
+                'source' => $source->getSourceName(),
+                'count' => $articleCount,
+                'status' => 'success',
+            ];
 
         } catch (Exception $exception) {
             Log::error(sprintf('Error aggregating from %s: %s', $source->getSourceName(), $exception->getMessage()));

@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\App;
-use App\Services\News\NewsAggregatorService;
-use App\Services\News\Sources\NewsApiSource;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
+use App\Services\News\NewsAggregatorService;
+use App\Services\News\Contracts\NewsSourceInterface;
 
 class FetchNewsCommand extends Command
 {
@@ -18,65 +16,68 @@ class FetchNewsCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'fetch:news {--source= Specific source to fetch from}';
+    protected $signature = 'fetch:news {--source= : Specific source to fetch from}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Fetch news from different source';
-
-    /**
-     * Create a new console command instance.
-     */
-    // public function __construct()
-    // {
-    // }
+    protected $description = 'Fetch news from configured sources';
 
     /**
      * Execute the console command.
      */
-    public function handle(NewsAggregatorService $newsAggregatorService)
+    public function handle(NewsAggregatorService $newsAggregatorService): int
     {
         $this->info('News aggregation started...');
 
         $sourceKey = $this->option('source');
-
         $sources = $newsAggregatorService->getSources();
 
-        Log::info('sources', [
-            'sources' => $sources,
-        ]);
+        if (empty($sources)) {
+            $this->error('No news sources configured.');
+            return self::FAILURE;
+        }
 
         if ($sourceKey) {
             if (! isset($sources[$sourceKey])) {
-                $this->error(sprintf('Source %s not found', $sourceKey));
-
-                return 1;
+                $this->error(sprintf("Source '%s' not found. Available sources: %s", $sourceKey, implode(', ', array_keys($sources))));
+                return self::FAILURE;
             }
 
-            $this->info((string) 'Fetching from: '.$sourceKey);
-
-            $result = $newsAggregatorService->aggregateFromSource($sources[$sourceKey]);
-            if (isset($result['error'])) {
-                $this->error(sprintf('Error fetching from %s: ', $sourceKey).$result['error']);
-            } else {
-                $this->info('Fetched '.($result['count'] ?? 0).(' articles from '.$sourceKey));
-            }
+            $this->processSource($newsAggregatorService, $sources[$sourceKey]);
         } else {
-            $results = $newsAggregatorService->aggregateFromAllSources();
-            foreach ($results as $key => $res) {
-                if (isset($res['error'])) {
-                    $this->error(sprintf('Error fetching from %s: ', $key).$res['error']);
-                } else {
-                    $this->info('Fetched '.($res['count'] ?? 0).(' articles from '.$key));
-                }
+            foreach ($sources as $source) {
+                $this->processSource($newsAggregatorService, $source);
             }
         }
 
         $this->info('News aggregation completed!');
 
-        return 0;
+        return self::SUCCESS;
     }
+
+    /**
+     * Process a single news source.
+     */
+    private function processSource(NewsAggregatorService $service, NewsSourceInterface $source): void
+    {
+        $sourceName = $source->getSourceName();
+
+        $this->line("Fetching from: <comment>{$sourceName}</comment>...");
+
+        $result = $service->aggregateFromSource($source);
+
+        if (($result['status'] ?? null) === 'error') {
+            $message = $result['error'] ?? 'Unknown error, try again.';
+
+            $this->error("Failed to fetch from {$sourceName}: {$message}");
+            return;
+        }
+
+        $count = $result['count'] ?? 0;
+        $this->info("Successfully fetched {$count} articles from {$sourceName}.");
+    }
+
 }
