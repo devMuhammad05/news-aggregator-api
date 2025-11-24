@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services\News\Sources;
 
+use App\Services\News\Contracts\NewsSourceInterface;
+use Exception;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Http\Client\ConnectionException;
-use Exception;
-use App\Services\News\Contracts\NewsSourceInterface;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 

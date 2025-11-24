@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use Illuminate\Contracts\Config\Repository;
 use App\Services\News\NewsAggregatorService;
-use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Config\Repository;
 use Illuminate\Support\ServiceProvider;
 
 class NewsAggregatorServiceProvider extends ServiceProvider
@@ -17,7 +16,7 @@ class NewsAggregatorServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(function ($app): NewsAggregatorService {
-            $service = new NewsAggregatorService();
+            $service = new NewsAggregatorService;
             $config = $app->make(Repository::class);
             $sources = $config->get('news_source.sources', []);
 
@@ -30,7 +29,7 @@ class NewsAggregatorServiceProvider extends ServiceProvider
             return $service;
         });
     }
-    
+
     /**
      * Bootstrap services.
      */

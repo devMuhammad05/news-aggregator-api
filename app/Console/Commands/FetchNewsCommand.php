@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Log;
-use App\Services\News\NewsAggregatorService;
 use App\Services\News\Contracts\NewsSourceInterface;
+use App\Services\News\NewsAggregatorService;
+use Illuminate\Console\Command;
 
 class FetchNewsCommand extends Command
 {
@@ -37,12 +36,14 @@ class FetchNewsCommand extends Command
 
         if (empty($sources)) {
             $this->error('No news sources configured.');
+
             return self::FAILURE;
         }
 
         if ($sourceKey) {
             if (! isset($sources[$sourceKey])) {
-                $this->error("Source '{$sourceKey}' not found. Available sources: " . implode(', ', array_keys($sources)));
+                $this->error("Source '{$sourceKey}' not found. Available sources: ".implode(', ', array_keys($sources)));
+
                 return self::FAILURE;
             }
 
@@ -73,11 +74,11 @@ class FetchNewsCommand extends Command
             $message = $result['error'] ?? 'Unknown error, try again.';
 
             $this->error("Failed to fetch from {$sourceName}: {$message}");
+
             return;
         }
 
         $count = $result['count'] ?? 0;
-        $this->info("Successfully fetched {$count} articles from {$sourceName}.");  
+        $this->info("Successfully fetched {$count} articles from {$sourceName}.");
     }
-
 }
