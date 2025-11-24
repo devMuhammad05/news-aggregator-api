@@ -42,7 +42,7 @@ class FetchNewsCommand extends Command
 
         if ($sourceKey) {
             if (! isset($sources[$sourceKey])) {
-                $this->error(sprintf("Source '%s' not found. Available sources: %s", $sourceKey, implode(', ', array_keys($sources))));
+                $this->error("Source '{$sourceKey}' not found. Available sources: " . implode(', ', array_keys($sources)));
                 return self::FAILURE;
             }
 
@@ -77,7 +77,7 @@ class FetchNewsCommand extends Command
         }
 
         $count = $result['count'] ?? 0;
-        $this->info("Successfully fetched {$count} articles from {$sourceName}.");
+        $this->info("Successfully fetched {$count} articles from {$sourceName}.");  
     }
 
 }

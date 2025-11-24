@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
 use Rector\Set\ValueObject\SetList;
-use Rector\TypeDeclaration\Rector\StmtsAwareInterface\DeclareStrictTypesRector;
-use RectorLaravel\Set\LaravelLevelSetList;
 use RectorLaravel\Set\LaravelSetList;
+use RectorLaravel\Set\LaravelLevelSetList;
+use Rector\CodingStyle\Rector\Encapsed\EncapsedStringsToSprintfRector;
+use Rector\TypeDeclaration\Rector\StmtsAwareInterface\DeclareStrictTypesRector;
 
 return RectorConfig::configure()
 
@@ -39,5 +40,6 @@ return RectorConfig::configure()
     ])
     ->withImportNames()
     ->withSkip([
+        EncapsedStringsToSprintfRector::class,
         __DIR__.'/bootstrap/cache',
     ]);
