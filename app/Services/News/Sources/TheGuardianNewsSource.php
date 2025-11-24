@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services\News\Sources;
 
-use Exception;
 use App\DTO\ArticleDTO;
+use Exception;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
