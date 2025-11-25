@@ -11,6 +11,8 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
+
+
 Schedule::call(function () {
     $newsService = App::make(NewsAggregatorService::class);
     $sources = $newsService->getSources();
