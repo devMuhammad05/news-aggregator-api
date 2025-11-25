@@ -8,4 +8,6 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::get('articles', [ArticleController::class, 'index']);
+Route::prefix('v1')->group(function (): void {
+    Route::get('articles', [ArticleController::class, 'index']);
+});
