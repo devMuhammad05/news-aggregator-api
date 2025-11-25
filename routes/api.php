@@ -8,5 +8,4 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-
-Route::get('articles', [ArticleController::class,'index']);
+Route::get('articles', [ArticleController::class, 'index']);
