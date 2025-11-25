@@ -10,7 +10,7 @@ class ArticleDTO
 {
     public function __construct(
         public readonly string $title,
-        public readonly ?string $author,
+        public readonly ?string $authorName,
         public readonly ?string $description,
         public readonly ?string $content,
         public readonly string $source,
@@ -26,7 +26,7 @@ class ArticleDTO
     {
         return [
             'title' => $this->title,
-            'author_name' => $this->author,
+            'author_name' => $this->authorName,
             'description' => $this->description,
             'content' => $this->content ?? '',
             'source' => $this->source,

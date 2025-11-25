@@ -51,7 +51,7 @@ class TheGuardianNewsSource extends AbstractNewsSource
         return array_map(function ($article) {
             return new ArticleDTO(
                 title: $article['webTitle'] ?? 'Untitled Article',
-                author: $article['fields']['byline'] ?? null,
+                authorName: $article['fields']['byline'] ?? null,
                 description: $article['fields']['trailText'] ?? null,
                 content: $article['fields']['body'] ?? null,
                 source: 'The Guardian',
@@ -84,7 +84,7 @@ class TheGuardianNewsSource extends AbstractNewsSource
 
                 return [
                     'success' => false,
-                    'error' => 'API request failed with status: '.$response->status(),
+                    'error' => 'API request failed with status: ' . $response->status(),
                     'data' => [],
                 ];
             }

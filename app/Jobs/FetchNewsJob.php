@@ -48,7 +48,6 @@ class FetchNewsJob implements ShouldQueue
         $sources = $newsAggregatorService->getSources();
 
         if (! isset($sources[$this->sourceKey])) {
-            Log::warning("News source '{$this->sourceKey}' not found");
 
             return;
         }
@@ -58,11 +57,9 @@ class FetchNewsJob implements ShouldQueue
         $result = $newsAggregatorService->aggregateFromSource($source);
 
         if (($result['status'] ?? null) === 'error') {
-            Log::error("Failed to fetch from {$source->getSourceName()}: {$result['error']}");
 
             return;
         }
 
-        Log::info("Successfully fetched {$result['count']} articles from {$source->getSourceName()}");
     }
 }

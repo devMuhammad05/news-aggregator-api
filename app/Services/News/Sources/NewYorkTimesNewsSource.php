@@ -51,7 +51,7 @@ class NewYorkTimesNewsSource extends AbstractNewsSource
         return array_map(function ($article) {
             return new ArticleDTO(
                 title: $article['headline']['main'] ?? 'Untitled Article',
-                author: $article['byline']['original'] ?? null,
+                authorName: $article['byline']['original'] ?? null,
                 description: $article['abstract'] ?? $article['snippet'] ?? null,
                 content: $article['lead_paragraph'] ?? null,
                 source: 'New York Times',

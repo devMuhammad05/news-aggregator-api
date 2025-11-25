@@ -43,7 +43,7 @@ class NewsApiSource extends AbstractNewsSource
         return array_map(function ($article) {
             return new ArticleDTO(
                 title: $article['title'] ?? 'Untitled Article',
-                author: $article['author'] ?? null,
+                authorName: $article['author'] ?? null,
                 description: $article['description'] ?? null,
                 content: $article['content'] ?? null,
                 source: $article['source']['name'] ?? 'NewsAPI',

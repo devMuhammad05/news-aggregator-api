@@ -7,7 +7,6 @@ namespace App\Services\News;
 use App\Models\Article;
 use App\Services\News\Contracts\NewsSourceInterface;
 use Exception;
-use Illuminate\Support\Facades\Log;
 
 class NewsAggregatorService
 {
@@ -62,7 +61,6 @@ class NewsAggregatorService
     public function aggregateFromSource(NewsSourceInterface $source, array $params = [])
     {
         try {
-            Log::info('Fetching articles from '.$source->getSourceName());
 
             $articles = $source->fetchArticles($params);
 
@@ -92,7 +90,6 @@ class NewsAggregatorService
                 'status' => 'success',
             ];
         } catch (Exception $exception) {
-            Log::error(sprintf('Error aggregating from %s: %s', $source->getSourceName(), $exception->getMessage()));
 
             return [
                 'source' => $source->getSourceName(),
