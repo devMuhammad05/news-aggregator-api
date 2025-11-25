@@ -84,7 +84,7 @@ class TheGuardianNewsSource extends AbstractNewsSource
 
                 return [
                     'success' => false,
-                    'error' => 'API request failed with status: ' . $response->status(),
+                    'error' => 'API request failed with status: '.$response->status(),
                     'data' => [],
                 ];
             }

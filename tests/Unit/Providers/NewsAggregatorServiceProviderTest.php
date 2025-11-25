@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use Tests\TestCase;
 use App\Providers\NewsAggregatorServiceProvider;
 use App\Services\News\Contracts\NewsSourceInterface;
 use App\Services\News\NewsAggregatorService;
+use Tests\TestCase;
 
 uses(TestCase::class);
 

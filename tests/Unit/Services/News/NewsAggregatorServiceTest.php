@@ -3,10 +3,8 @@
 declare(strict_types=1);
 
 use App\DTO\ArticleDto;
-use App\Models\Article;
 use App\Services\News\Contracts\NewsSourceInterface;
 use App\Services\News\NewsAggregatorService;
-use Illuminate\Support\Facades\Log;
 
 /**
  * Create a mock news source
@@ -28,7 +26,7 @@ function createMockSource(string $key, string $name): NewsSourceInterface
 function createArticleDtos(int $count, string $prefix = 'article'): array
 {
     $dtos = [];
-    
+
     for ($i = 1; $i <= $count; $i++) {
         $dtos[] = new ArticleDto(
             title: "Test Article {$prefix}-{$i}",
@@ -46,7 +44,7 @@ function createArticleDtos(int $count, string $prefix = 'article'): array
 }
 
 beforeEach(function () {
-    $this->service = new NewsAggregatorService();
+    $this->service = new NewsAggregatorService;
 });
 
 it('can add a source', function () {
