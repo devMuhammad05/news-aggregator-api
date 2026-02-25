@@ -1,0 +1,84 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Services\News\Sources;
+
+use App\Services\News\Contracts\NewsSourceInterface;
+use Exception;
+use Illuminate\Contracts\Config\Repository;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+
+abstract class AbstractNewsSource implements NewsSourceInterface
+{
+    protected string $baseUrl;
+
+    protected string $apiKey;
+
+    protected int $timeout = 30;
+
+    public function __construct(Repository $repository)
+    {
+        $this->apiKey = $repository->get("news_source.sources.{$this->getSourceKey()}.api_key");
+        $this->baseUrl = $repository->get("news_source.sources.{$this->getSourceKey()}.base_url");
+    }
+
+    /**
+     * @param  array<string, mixed>  $params
+     * @return array<string, mixed>
+     */
+    protected function makeRequest(array $params = []): array
+    {
+        try {
+            $response = Http::timeout($this->timeout)
+                ->withHeaders([
+                    'Authorization' => (string) 'Bearer '.$this->apiKey,
+                    'Accept' => 'application/json',
+                ])
+                ->get($this->baseUrl, $params);
+
+            if ($response->failed()) {
+                Log::error('API request failed', [
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+
+                return [
+                    'success' => false,
+                    'error' => 'API request failed with status: '.$response->status(),
+                    'data' => [],
+                ];
+            }
+
+            $data = $response->json();
+
+            Log::info('API request successful', [
+                'data' => $data,
+            ]);
+
+            return [
+                'success' => true,
+                'data' => $data,
+            ];
+        } catch (ConnectionException $e) {
+            return [
+                'success' => false,
+                'error' => 'Connection timeout or network error',
+                'data' => [],
+            ];
+        } catch (Exception $e) {
+            Log::error('API request exception', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+                'data' => [],
+            ];
+        }
+    }
+}
